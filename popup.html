@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Vimium Hinter</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #1d1e20;
+            --surface: #38393d;
+            --border: #55565a;
+            --text: #dfdfe4;
+            --muted: #a0a1a8;
+            --accent: #80d682;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Size the document, not just the body: Chrome derives the popup window
+           from the document's box, and an unsized document can collapse. */
+        html,
+        body {
+            width: 380px;
+        }
+
+        body {
+            max-height: 580px;
+            margin: 0;
+            padding: 16px;
+            overflow-y: auto;
+            font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        h1 {
+            margin: 0 0 2px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .sub {
+            margin-bottom: 12px;
+            color: var(--muted);
+        }
+
+        .site {
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .field {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .switch {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 6px 0 0;
+            cursor: pointer;
+        }
+
+        .switch input {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .switch input:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* On a page the extension cannot run on the switch is disabled, so the
+           row must stop looking like an action: muted text, no pointer. */
+        .switch.is-disabled {
+            cursor: default;
+        }
+
+        .switch.is-disabled span {
+            color: var(--muted);
+        }
+
+        .switch input:disabled {
+            cursor: default;
+            opacity: 0.55;
+            accent-color: var(--muted);
+        }
+
+        .hint {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .hint code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        textarea,
+        select {
+            width: 100%;
+            padding: 6px 8px;
+            font: inherit;
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        textarea {
+            min-height: 88px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 0;
+            accent-color: var(--accent);
+        }
+
+        textarea:focus-visible,
+        select:focus-visible,
+        input[type="range"]:focus-visible,
+        button.text:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Label and its reset share one line; the slider spans the field. */
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .row label {
+            margin-bottom: 0;
+        }
+
+        /* Reset is a link-styled button: secondary next to the slider, but still
+           a real button for keyboard and screen-reader users. */
+        button.text {
+            padding: 0;
+            font: inherit;
+            font-weight: 400;
+            color: var(--accent);
+            background: none;
+            border: 0;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        hr {
+            height: 0;
+            margin: 12px 0;
+            border: 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .status {
+            min-height: 18px;
+            margin: 0;
+            font-size: 12px;
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Vimium Hinter</h1>
+<p class="sub">Gives Vimium more elements to hint.</p>
+
+<div class="field">
+    <div class="site" id="site">&hellip;</div>
+    <label class="switch" id="enabledSwitch" for="enabled">
+        <input type="checkbox" id="enabled" role="switch" aria-describedby="reason" disabled>
+        <span>Hints on this site</span>
+    </label>
+    <p class="hint" id="reason"></p>
+</div>
+
+<hr>
+
+<div class="field">
+    <label for="mode">Where it runs</label>
+    <select id="mode">
+        <option value="whitelist">On specific sites only</option>
+        <option value="blacklist">On all sites except</option>
+    </select>
+</div>
+
+<div class="field">
+    <label for="patterns" id="patternsLabel">Sites where it runs</label>
+    <textarea id="patterns" spellcheck="false" autocomplete="off" placeholder="example.com"></textarea>
+    <p class="hint">One rule per line; matched anywhere in the address.</p>
+    <p class="hint" id="emptyHint"></p>
+</div>
+
+<div class="field">
+    <div class="row">
+        <label for="debounceDelay">Re-scan wait: <span id="delayValue">300</span> ms</label>
+        <button type="button" id="resetDelay" class="text">Reset</button>
+    </div>
+    <input type="range" id="debounceDelay" min="150" max="3000" step="50" value="300">
+    <label class="switch" for="scanDot">
+        <input type="checkbox" id="scanDot">
+        <span>Show re-scan activity on the icon</span>
+    </label>
+    <p class="hint">A dot in the corner of the icon turns amber while the re-scan waits, green once hints are applied. The icon is grey on pages it can't run on.</p>
+</div>
+
+<p class="status" id="status" role="status" aria-live="polite"></p>
+
+<script src="rules.js"></script>
+<script src="runnability.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

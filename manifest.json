@@ -1,21 +1,28 @@
 {
   "manifest_version": 3,
 
-  "name": "Vimium Helper",
-  "description": "Let Vimuim see even more elements to add click hints to.",
-  "version": "1.0.5",
-  "offline_enabled": true,
+  "name": "Vimium Hinter",
+  "description": "Let Vimium see even more elements to add click hints to.",
+  "version": "1.3.0",
+  "minimum_chrome_version": "88",
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "action": {
+    "default_title": "Vimium Hinter",
+    "default_popup": "popup.html"
+  },
 
   "icons": {
     "16": "images/logo-16.png",
     "48": "images/logo-48.png",
-    "128": "images/logo-128.png"},
-
-  "options_ui": {
-    "page": "options.html"
+    "128": "images/logo-128.png"
   },
 
   "permissions": [
+    "activeTab",
     "storage"
   ],
 
@@ -23,7 +30,8 @@
     {
       "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["script.js"]
+      "run_at": "document_start",
+      "js": ["rules.js", "runnability.js", "script.js"]
     }
   ]
 }

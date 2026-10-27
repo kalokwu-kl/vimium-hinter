@@ -1,1 +1,32 @@
+# ---- Build output ----
+dist/
 *.zip
+node_modules/
+
+# ---- AI / assistant tooling (local only, not part of the extension) ----
+.freebuff/
+.context-engine.yaml
+.cce/
+.mcp.json
+opencode.json
+.claude/
+.codebuff/
+.cursor/
+CLAUDE.md
+AGENTS.md
+.github/copilot-instructions.md
+GEMINI.md
+.aider*
+
+# ---- Local-only: terminology notes (not part of the extension) ----
+GLOSSARY.md
+
+# ---- Editor & OS junk ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- Local-only: design notes (not part of the extension) ----
+docs/
