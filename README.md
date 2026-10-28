@@ -5,7 +5,7 @@
 > page roles alone, and tests. All credit for the original idea and
 > implementation goes to the upstream project.
 
-Let [Vimium](https://vimium.com/) hint more of the page. Custom buttons,
+Let [Vimium](https://chromewebstore.google.com/detail/vimium/dbepggeogbaibhgnhhndojpepiihcmeb) hint more of the page. Custom buttons,
 icon-only controls and app rows that are plain `div`s in the markup — WhatsApp
 Web's chat list is the everyday example — are tagged `role="button"`, the signal
 Vimium is looking for, so you can reach them from the keyboard instead of the
